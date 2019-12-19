@@ -7,21 +7,21 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Work assessment system</title>
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"> -->
 </head>
 
 <body>
-<div class="container">
+<!-- <div class="container"> -->
     <hr>
     <h1>Система оценки работ</h1>
     <hr>
 
-    <form id="uploadbanner" enctype="multipart/form-data" method="POST" action="upload/">
+    <form enctype="multipart/form-data" method="POST" action="/uploaded">
         <section>
             <h3> Загрузите файл любого формата </h3>
             <p>
-                <input id="fileupload" name="myfile" type="file" />
-                <input type="submit" value="Отправить" id="submit" />
+                <input name="workfile" type="file" />
+                <input type="submit" value="Отправить"/>
             </p>
         </section>
     </form>
@@ -71,7 +71,7 @@
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
     -->
-</div>
+<!-- </div> -->
 </body>
 
 </html>
