@@ -18,9 +18,9 @@
     <h1>Система оценки работ</h1>
     <hr>
 
-    <form enctype="multipart/form-data" method="POST" action="/uploaded">
+    <form id="uploader" enctype="multipart/form-data" method="POST" action="/uploaded">
         <section>
-            <h3> Загрузите файл любого формата </h3>
+            <h3>Загрузка работ</h3>
             <p>
                 <input name="workfile" type="file" />
                 <input type="submit" value="Отправить"/>
@@ -29,10 +29,14 @@
     </form>
 
     <form id="assessmentbanner">
-        <button id="wb" type="button" onclick="f()"> Начать </button>
-        <!--<h3 id="workHeader"> Оценка работ </h3>-->
-        <!--<input type = "button" value="Начать" onclick="prepareTasks();">-->
+        <h3 id="wh">Оценка работ</h3>
+        <button id="wb" type="button" onclick="requestForFilenames()">Взять на оценку</button>
     </form>
+
+    <form id="task"></form>
+
+
+
 <!--
     <form id="works" on>
         <h3> Оценка работ </h3>
