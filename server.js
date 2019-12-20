@@ -6,6 +6,8 @@ const app = express();
 
 const bodyParser = require('body-parser');
 
+const async = require('async');
+
 const port = 8080;
 
 const fileUpload = require('express-fileupload');
@@ -14,7 +16,7 @@ app.use(fileUpload());
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// app.use(bodyParser.json());
+app.use(bodyParser.json());
 
 /*<<<<<<<<<<<<<     SQL settings init   >>>>>>>>>>>>>>>>>>>*/
 
@@ -98,7 +100,7 @@ app.post('/uploaded',(req, res) => {
 
    console.log(work_name);
 
-   return res.status(200).send('Файл успешно добавлен в базу данных и загружен на сервер');
+   res.status(200).send('Файл успешно добавлен в базу данных и загружен на сервер');
 });
 
 app.get('/uploaded', (req, res) => {
@@ -112,33 +114,40 @@ app.get('/works', (req, res) => {
          if (err)
             return res.status(404).send(err.message);
 
-         //console.log(JSON.stringify(result));
-
-         var references = [];
+         var resdata = []; // RESPONSE DATA ARRAY
 
          var workfiles = JSON.parse(JSON.stringify(result));
 
-         workfiles.forEach(function (workfile) {
-            var marksdata = querymarks(workfile.Id);
-         });
+         bake().then(()=>res.contentType('application/json').status(200).
+            send(JSON.stringify(resdata)),()=>res.status(404).send('Error'));
+
+         async function bake() {
+
+             const promises = workfiles.map( (workfile) => {
+
+                 return new Promise((resolve, reject) => {
+
+                     connection.query('SELECT Mark, Comment FROM Assessments WHERE Fileid = ?',
+                         [workfile.Id],
+                         (in_err, in_result, in_fields) => {
+
+                             if (in_err)
+                                 reject('REJECT'); // NEED TO FIX
+
+                             const marksdata = JSON.parse(JSON.stringify(in_result));
+
+                             resdata.push({'Filename': workfile.Filename, 'Reference' : __dirname + '\\uploaded\\' +
+                                     workfile.Filename, 'Marksdata' : marksdata});
+
+                             resolve('SUCCESS');
+                         });
+
+                 });
+
+             });
+             await Promise.all(promises);
+         }
 
        });
 
 });
-
-function querymarks(Fileid) {
-   connection.query('SELECT Mark, Comment FROM Assessments WHERE Fileid = ?',[Fileid],
-       (err, result, fields) => {
-         if (err)
-            return err; // NEED TO FIX
-
-         var marksdata = JSON.parse(JSON.stringify(result));
-
-         console.log(marksdata);
-
-         return marksdata;
-       });
-
-}
-
-
