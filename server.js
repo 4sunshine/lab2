@@ -118,8 +118,8 @@ app.get('/works', (req, res) => {
 
          var workfiles = JSON.parse(JSON.stringify(result));
 
-         bake().then(()=>res.contentType('application/json').status(200).
-            send(JSON.stringify(resdata)),()=>res.status(404).send('Error'));
+         bake().then(()=> res.contentType('application/json').status(200).
+            send(JSON.stringify(resdata)), () => res.status(404).send('Error'));
 
          async function bake() {
 
@@ -151,3 +151,7 @@ app.get('/works', (req, res) => {
        });
 
 });
+
+app.get('/prepare.js',(req, res) =>
+    res.sendFile(__dirname + '/prepare.js')
+);
