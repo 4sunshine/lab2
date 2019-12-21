@@ -159,3 +159,18 @@ app.get('/prepare.js',(req, res) =>
 app.get('/uploaded/:filename',(req,res) => {
    res.sendFile(__dirname + /uploaded/ + req.params.filename);
 });
+
+app.post('/mark',(req, res) => {
+
+    connection.query('INSERT INTO Assessments(Mark,Comment) VALUES(?,?)',
+        [req.body.mark, req.body.comment], (err) => {
+            if (err) {
+                console.log(err);
+
+                if (err.code == 1062) {
+                    return res.status(409).send('Ошибка');
+                }
+                return res.status(204).send();
+            }
+        });
+});

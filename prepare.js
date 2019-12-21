@@ -6,85 +6,64 @@ function requestForFilenames() {
 
         xreq.send();
 
-        if (xreq.response)
-        {
+        if (xreq.response) {
                 var data = JSON.parse(xreq.responseText);
 
-                document.getElementById("wb").style.display = "none";
+                addTask(data);
 
-                document.getElementById("uploader").style.display= "none";
-
-                addContent(data);
-        }
-
-        else
-        {
-                // data = [];
-
+        } else {
                 alert('Не удалось получить работы');
         }
-
 }
 
-function addContent(data) {
+function addTask(data) {
+
+        hideElement(document.getElementById("uploader"));
+
+        hideElement(document.getElementById("wb"));
+
+        showElement(document.getElementById("task"));
 
         let i = 0;
 
-        var div = document.createElement("div");
-
-        div.innerHTML = '<div class="container" id="radiodiv" ></div>';
-
-        document.getElementById("task").appendChild(div);
-
         data.forEach((element) => {
-/*
-                var work = document.createElement("p");
 
-                work.innerHTML =
-                    `<p><input type="radio" name="workname" id="${element.Filename}"\
-                        value="${element.Filename}"> ${element.Filename}</p>`;
+                document.getElementById("work" + i).innerHTML = element.Filename;
 
-                div.appendChild(work);
-*/
-                var work = document.createElement("p");
+                document.getElementById("work" + i).style.visibility = 'visible';
 
-                work.innerHTML =
-                    `<p><a target="workwindow" href="/uploaded/${element.Filename}">${element.Filename}</a></p>`;
-
-                });
-
-                div.appendChild(work);
+                document.getElementById("work" + i).href = "/uploaded/" + element.Filename;
 
                 i++;
         });
+}
 
-        document.getElementById(data[0].Filename).checked = true;
+function hideElement(element) {
+        element.style.display = "none";
+}
 
-        var buttons = document.createElement("p");
+function showElement(element) {
+        element.style.display = "block";
+        element.style.visibility = "visible";
+}
 
-        buttons.innerHTML =
-            '<p><button id = "showmarks" onclick="showMarks()" type="button">Показать оценки и комментарии</button>' +
-            '<button id = "showfile" onclick="showWork()" type="button">Оценить работу</button></p>';
+function disable(element) {
+        element.disabled = true;
+}
 
-        div.appendChild(buttons);
-
+function enable(element) {
+        element.disabled = false;
 }
 
 function showMarks() {
 
-        document.getElementById("showmarks").innerHTML =
-            document.querySelector('input[name="workname"]:checked').value;
-
 }
 
-function showWork() {
-        document.getElementById("workwindow").style.visibility = "visible";
-}
+function updateWorkName(filename) {
 
-function hideMarks() {
+        document.getElementById("workname").value = filename;
 
-}
+        enable(document.getElementById("markbutton"));
 
-function hideWork() {
-
+        enable(document.getElementById("allmarksbutton"));
 }

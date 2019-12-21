@@ -8,7 +8,6 @@
     <title>Work assessment system</title>
     <script src ="/prepare.js"></script>
 
-
     <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"> -->
 </head>
 
@@ -18,7 +17,7 @@
     <h1>Система оценки работ</h1>
     <hr>
 
-    <form id="uploader" enctype="multipart/form-data" method="POST" action="/uploaded">
+    <form id="uploader" enctype="multipart/form-data" method="POST" action="/uploaded" onsubmit="closeAssessment();">
         <section>
             <h3>Загрузка работ</h3>
             <p>
@@ -33,63 +32,39 @@
         <button id="wb" type="button" onclick="requestForFilenames()">Взять на оценку</button>
     </form>
 
-    <form id="task"></form>
-
-    <iframe name="workwindow" width="100%" height="60%" style="visibility: hidden"></iframe>
-
-
-
-
-
-<!--
-    <form id="works" on>
-        <h3> Оценка работ </h3>
-        <button> Начать! </button>
-        <script src=""
+    <form id="task" style="visibility: hidden">
+        <p><a id="work0" target="workwindow" href="" onclick="updateWorkName(this.innerHTML)"></a></p>
+        <p><a id="work1" target="workwindow" href="" onclick="updateWorkName(this.innerHTML)"></a></p>
+        <p><a id="work2" target="workwindow" href="" onclick="updateWorkName(this.innerHTML)"></a></p>
+        <p>
+            <button id = "allmarksbutton" onclick="showMarks()" type="button" disabled>Показать оценки и комментарии</button>
+            <button id = "markbutton" onclick="javascript: showElement(document.getElementById('markform')); this.disabled = true;"\
+                    type="button" disabled>Оценить работу</button>
+        </p>
+        <iframe id="workframe" name="workwindow" width="100%" height="90%"></iframe>
     </form>
--->
 
-    <!--
-    <form action='/' method="GET"> DEFINE METHOD AND ADDRESS HERE LATER
-        <section>
-            <h2>Upload your file here</h2>
-            <p>You can upload files with all possible extensions</p>
-        </section>>
+    <form id="markform" style="display: none" style="visibility: hidden" method="POST"\
+          action="/mark" onsubmit="hideElement(this);">
+        <p>
+            <label for="mark">Оцените работу</label>
+        </p>
+        <p>
+            <input  id="workname" name="workname" type="text" readonly required>
+        </p>
 
-        <div class="form-group">
-            <label for="exampleInputPassword1">ISBN</label>
-            <input class="form-control" name="isbn">
-        </div>
+        <p><input required id="mark" type="number" name="mark" step="1" value="5" max="5" min="1"></p>
 
-        <div class="form-group">
-            <label for="exampleInputPassword1">Title</label>
-            <input class="form-control" name="title">
-        </div>
-
-        <div class="form-group">
-            <label for="exampleInputPassword1">Author</label>
-            <input class="form-control" name="author">
-        </div>
-
-        <div class="form-group">
-            <label for="exampleInputPassword1">Published Date</label>
-            <input type="date" class="form-control" name="publish_date">
-        </div>
-
-        <div class="form-group">
-            <label for="exampleInputPassword1">Publisher</label>
-            <input class="form-control" name="publisher">
-        </div>
-
-        <div class="form-group">
-            <label for="exampleInputPassword1">Number Of Pages</label>
-            <input type="number" class="form-control" name="numOfPages">
-        </div>
-
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <p>
+            <label for="comment">Введите комментарий к оценке</label>
+        </p>
+        <p>
+            <textarea id="comment" name="comment" cols="30" rows="6" required type="text" maxlength="500"></textarea>
+        </p>
+        <p>
+        <input type="submit" value="Отправить оценку!">
+        </p>
     </form>
-    -->
-<!-- </div> -->
 
 </body>
 
