@@ -6,7 +6,7 @@ const app = express();
 
 const bodyParser = require('body-parser');
 
-const async = require('async');
+// const async = require('async');
 
 const port = 8080;
 
@@ -155,3 +155,7 @@ app.get('/works', (req, res) => {
 app.get('/prepare.js',(req, res) =>
     res.sendFile(__dirname + '/prepare.js')
 );
+
+app.get('/uploaded/:filename',(req,res) => {
+   res.sendFile(__dirname + /uploaded/ + req.params.filename);
+});
