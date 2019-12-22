@@ -17,7 +17,7 @@
     <h1>Система оценки работ</h1>
     <hr>
 
-    <form id="uploader" enctype="multipart/form-data" method="POST" action="/uploaded" onsubmit="closeAssessment();">
+    <form id="uploader" enctype="multipart/form-data" method="POST" action="/uploaded">
         <section>
             <h3>Загрузка работ</h3>
             <p>
@@ -27,7 +27,7 @@
         </section>
     </form>
 
-    <form id="assessmentbanner">
+    <form id="assessment">
         <h3 id="wh">Оценка работ</h3>
         <button id="wb" type="button" onclick="requestForFilenames()">Взять на оценку</button>
     </form>
@@ -37,8 +37,10 @@
         <p><a id="work1" target="workwindow" href="" onclick="updateWorkName(this.innerHTML)"></a></p>
         <p><a id="work2" target="workwindow" href="" onclick="updateWorkName(this.innerHTML)"></a></p>
         <p>
-            <button id = "allmarksbutton" onclick="showMarks()" type="button" disabled>Показать оценки и комментарии</button>
-            <button id = "markbutton" onclick="javascript: showElement(document.getElementById('markform')); this.disabled = true;"\
+            <button id = "allmarksbutton"\
+                    onclick="showMarks()" type="button" disabled>Показать оценки и комментарии</button>
+            <button id = "markbutton"\
+                    onclick="javascript: showElement(document.getElementById('markform')); this.disabled = true;"\
                     type="button" disabled>Оценить работу</button>
         </p>
         <iframe id="workframe" name="workwindow" width="100%" height="90%"></iframe>

@@ -1,33 +1,47 @@
-/********************SERVER INIT*********************/
+/******************** НАСТРОЙКИ СЕРВЕРА *********************/
 
+//подключение внешнего модуля express для обработки запросов
 const express = require('express');
 
+//инициализация внешнего модуля express
 const app = express();
 
+//подключение внешнего модуля body-parser - парсер http запроса
+//парсирование - выделение объектов из строки
 const bodyParser = require('body-parser');
 
 // const async = require('async');
 
+//порт сервера
 const port = 8080;
 
+//подключение внешнего модуля express-fileupload - обработчик загрузки файлов
 const fileUpload = require('express-fileupload');
 
+//добавляем промежуточный обработчик загрузки файлов
 app.use(fileUpload());
 
+//добавляем промежуточный обработчик парсирования URL
 app.use(bodyParser.urlencoded({ extended: true }));
 
+//добавляем промежуточный обработчик парсирования json файлов
 app.use(bodyParser.json());
 
-/*<<<<<<<<<<<<<     SQL settings init   >>>>>>>>>>>>>>>>>>>*/
+/******************** НАСТРОЙКИ СЕРВЕРА SQL *********************/
 
+//подключение внешнего модуля mysql для работы с СУБД MySQL
 const db = require('mysql');
 
+//подключение внешнего модуля fs для выполнения операций с элементами файловой системы
 const fs = require('fs');
 
+//чтение и парсинг файла конфигурации соединения с  MySQL - sqlconfig.json. Где __dirname - корневая дирректория
 const sqlConfig = JSON.parse(fs.readFileSync(__dirname + '/sqlconfig.json','UTF-8'));
 
+//установка соединения сервера с MySQL. В качестве переметров передается файл конфигурации соединения.
 const connection = db.createConnection(sqlConfig);
 
+//проверка возможсти установки прямого соединения с MySQL
 connection.connect((err) => {
    if (err) {
       console.log(err);
@@ -37,22 +51,29 @@ connection.connect((err) => {
       console.log("SQL server connection established");
 });
 
-// ${port} error must be fixed
-app.listen(port, () => console.log('DataServer is listening on port: ${port}.'));
+//запуск прослушки порта
+app.listen(port, () => console.log('DataServer is listening on port: ' + port));
 
-/********************SERVER INIT END*********************/
+/************** ЗАВЕРШЕНИЕ НАСТРОЙКИ СЕРВЕРА *****************/
 
-/*******************REST API START***********************/
-
-// GET LOCALHOST:8080
+/*********************** REST API ****************************/
+//определение ресурсов и методов доступа к ним
+//Rest API Каждый «объект» однозначно описывается своим url
+//обработка обащения к домашней странице -  GET LOCALHOST:8080
 app.get('/', (req, res) => {
    res.sendFile(__dirname + '/index.html')
 });
 
+//обработка загрузки файлов на сервер
 app.post('/uploaded',(req, res) => {
-   if (!req.files || (Object.keys(req.files).length === 0)) {
-      return res.status(400).send('Файл не был загружен!');
-   }
+    console.log(req.files);
+    console.log('^^^^^^^BODY>>>>>>>KEYS');
+    console.log(Object.keys(req.files));
+    console.log(Object.keys(req.files).length);
+
+    if (!req.files || (Object.keys(req.files).length === 0)) {
+        return res.status(400).send('Файл не был загружен!');
+    }
 
    let work = req.files.workfile;
 
