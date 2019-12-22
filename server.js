@@ -173,8 +173,8 @@ app.get('/works', (req, res) => {
 
 });
 
-app.get('/prepare.js',(req, res) =>
-    res.sendFile(__dirname + '/prepare.js')
+app.get('/cli.js',(req, res) =>
+    res.sendFile(__dirname + '/cli.js')
 );
 
 app.get('/uploaded/:filename',(req,res) => {
