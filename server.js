@@ -138,13 +138,21 @@ app.get('/uploaded', (req, res) => {
 app.get('/works', (req, res) => {
 
    connection.query('SELECT * FROM Workfiles ORDER BY Markscount ASC LIMIT 3',[],
-       (err, result, fields) => {
+       (err, result) => {
          if (err)
             return res.status(404).send(err.message);
 
-         var resdata = []; // RESPONSE DATA ARRAY
+         return res.contentType('application/json').status(200).send(JSON.stringify(result));
 
-         var workfiles = JSON.parse(JSON.stringify(result));
+         /////////////////////////////////////////////////////////////////////////////////////
+
+         let resdata = []; // RESPONSE DATA ARRAY
+
+         let workfiles = JSON.parse(JSON.stringify(result));
+
+         console.log(workfiles);
+
+
 
          bake().then(()=> res.contentType('application/json').status(200).
             send(JSON.stringify(resdata)), () => res.status(404).send('Error'));
@@ -190,15 +198,21 @@ app.get('/uploaded/:filename',(req,res) => {
 
 app.post('/mark',(req, res) => {
 
-    connection.query('INSERT INTO Assessments(Mark,Comment) VALUES(?,?)',
-        [req.body.mark, req.body.comment], (err) => {
+    connection.query('INSERT INTO Assessments(Fileid,Mark,Comment) VALUES(?,?,?)',
+        [req.body.fileid, req.body.mark, req.body.comment], (err) => {
             if (err) {
-                console.log(err);
-
-                if (err.code == 1062) {
-                    return res.status(409).send('Ошибка');
-                }
-                return res.status(204).send();
+                return res.status(409).send('Ошибка загрузки оценки в базу данных!');
             }
-        });
+
+            // увеличиваем число оценок, выставленных работе, на 1
+            connection.query('UPDATE Workfiles SET Markscount = Markscount + 1 WHERE Id = ?',
+                [req.body.fileid], (_err) => {
+                if (_err) {
+                    // второй запрос к базе данных - возможны ошибки в подсчёте оценок
+                    // например при разрыве соединения
+                    return res.status(409).send('Ошибка подсчёта числа оценок!');
+                }
+                return res.status(200).send('Оценка выставлена успешно!');
+            });
+    });
 });

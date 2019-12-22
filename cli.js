@@ -30,6 +30,8 @@ function addTask(data) {
 
                 document.getElementById("work" + i).innerHTML = element.Filename;
 
+                document.getElementById("work" + i).setAttribute('data-fileid', element.Id);
+
                 document.getElementById("work" + i).style.visibility = 'visible';
 
                 document.getElementById("work" + i).href = "/uploaded/" + element.Filename;
@@ -59,8 +61,10 @@ function showMarks() {
 
 }
 
-function updateWorkName(filename) {
-        document.getElementById("workname").value = filename;
+// установка идентификатора текущего файла на проверке
+// данные хранятся в дополнительном аттрибуте data-fileid выбранной ссылки
+function SetCurrentFileid(areference) {
+        document.getElementById("fileid").value = areference.getAttribute('data-fileid');
 
         enable(document.getElementById("markbutton"));
 
@@ -76,10 +80,14 @@ function clearFrame(frame) {
                     frame.window.contentDocument.documentElement.innerText;
 
                 if (content) {
+
+                        frame.style.backgroundColor = "lightskyblue";
+
                         setTimeout(f, 2000);
 
                         function f() {
                                 frame.src = "about:blank";
+                                frame.style.backgroundColor = "white";
                         }
                 }
         }

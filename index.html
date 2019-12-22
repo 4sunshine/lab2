@@ -21,6 +21,7 @@
             style="display: block; border: none"\
             width="100%" height="30px" scrolling="no" onload="clearFrame(this)" ></iframe>
 
+    <!-- отклик сервера отображается в iframe : name="status" -->
     <form id="uploader" enctype="multipart/form-data" method="POST" action="/uploaded" target="status">
         <h3>Загрузка работ</h3>
         <p>
@@ -35,36 +36,37 @@
     </form>
 
     <form id="task" style="visibility: hidden">
-        <p><a id="work0" target="workwindow" href="" onclick="updateWorkName(this.innerHTML)"></a></p>
-        <p><a id="work1" target="workwindow" href="" onclick="updateWorkName(this.innerHTML)"></a></p>
-        <p><a id="work2" target="workwindow" href="" onclick="updateWorkName(this.innerHTML)"></a></p>
+
+        <!-- data-fileid - дополнительный аттрибут для хранения Fileid из таблицы Workfiles -->
+
+        <p><a id="work0" target="workwindow" data-fileid="" href="" onclick="SetCurrentFileid(this)"></a></p>
+        <p><a id="work1" target="workwindow" data-fileid="" href="" onclick="SetCurrentFileid(this)"></a></p>
+        <p><a id="work2" target="workwindow" data-fileid="" href="" onclick="SetCurrentFileid(this)"></a></p>
         <p>
             <button id = "allmarksbutton"\
                     onclick="showMarks()" type="button" disabled>Показать оценки и комментарии</button>
             <button id = "markbutton"\
-                    onclick="javascript: showElement(document.getElementById('markform')); this.disabled = true;"\
+                    onclick="javascript: showElement(document.getElementById('markform')); disable(this);"\
                     type="button" disabled>Оценить работу</button>
         </p>
         <iframe id="workframe" name="workwindow" width="100%" height="90%"></iframe>
+
     </form>
 
     <form id="markform" style="display: none" style="visibility: hidden" method="POST"\
-          action="/mark" target="_self"> <!-- onsubmit="hideElement(this);"> -->
+          action="/mark" target="status"> <!-- onsubmit="hideElement(this);"> -->
 
-        <p>
-            <label for="mark">Оцените работу</label>
-        </p>
+        <!-- скрытые поля input для передачи имени файла и его идентификатора -->
+        <p><input id="fileid" name="fileid" type="hidden"></p>
 
-        <p>
-            <input  id="workname" name="workname" type="text" readonly required>
-        </p>
+        <p><label for="mark">Оцените выбранную работу от 1 до 5</label></p>
 
-        <p><input required id="mark" type="number" name="mark" step="1" value="5" max="5" min="1"></p>
+        <p><input required id="mark" type="number" name="mark" step="1" max="5" min="1"></p>
 
         <p><label for="comment">Введите комментарий к оценке</label></p>
 
         <p>
-            <textarea id="comment" name="comment" cols="30" rows="6" required type="text" maxlength="500"></textarea>
+            <textarea required id="comment" name="comment" cols="30" rows="6" type="text" maxlength="500"></textarea>
         </p>
 
         <p><input type="submit" value="Отправить оценку!"></p>
