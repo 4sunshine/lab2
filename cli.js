@@ -60,10 +60,28 @@ function showMarks() {
 }
 
 function updateWorkName(filename) {
-
         document.getElementById("workname").value = filename;
 
         enable(document.getElementById("markbutton"));
 
         enable(document.getElementById("allmarksbutton"));
+}
+
+//очистка уведомления iframe
+function clearFrame(frame) {
+        try {
+                //содержимое документа iframe 1ая строка - Chrome, 2ая - IE
+                //дял пустых iframe выдаёт ошибку чтения contentDocument
+                const content = frame.contentDocument.documentElement.innerText ||
+                    frame.window.contentDocument.documentElement.innerText;
+
+                if (content) {
+                        setTimeout(f, 2000);
+
+                        function f() {
+                                frame.src = "about:blank";
+                        }
+                }
+        }
+        catch (e) {}
 }

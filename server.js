@@ -10,8 +10,6 @@ const app = express();
 //парсирование - выделение объектов из строки
 const bodyParser = require('body-parser');
 
-// const async = require('async');
-
 //порт сервера
 const port = 8080;
 
@@ -66,64 +64,73 @@ app.get('/', (req, res) => {
 
 //обработка загрузки файлов на сервер
 app.post('/uploaded',(req, res) => {
-    console.log(req.files);
-    console.log('^^^^^^^BODY>>>>>>>KEYS');
-    console.log(Object.keys(req.files));
-    console.log(Object.keys(req.files).length);
+
+    // Добавление даты и времени обработки файла в его имя. Имя файла_ДатаВремя.Расширение
+    // Для существенного уменьшения вероятности встречи файлов с одинаковыми именами
+    function NameWithTimestamp(Filename) {
+
+        // NameAndExtension возвращает массив: [имя файла, .расширение файла]
+        function NameAndExtension(filename) {
+
+            let file_ext = Filename.split('.').pop(); // GETTING EXTENSION
+
+            let file_name = Filename; // WORK NAME ON SERVER
+
+            let regex = new RegExp("." + file_ext, "i"); // REGULAR EXPRESSION FOR EXTENSION
+
+            // CHECK IF NAME CONTAINS NO EXTENSION
+
+            if ( file_name != file_ext ) {
+
+                file_ext = "." + file_ext;
+
+                file_name = file_name.replace(regex, "");
+            }
+
+            else
+                file_ext = "";
+
+            return [file_name,file_ext];
+        }
+
+        let name_ext = NameAndExtension(Filename);
+
+        let date = new Date();
+
+        return name_ext[0] + "_" + date.getFullYear() + (date.getMonth() + 1) + date.getDate()
+            + "_" + date.getHours() + date.getMinutes() + date.getSeconds() + "_" + date.getMilliseconds()
+            + name_ext[1];
+    }
 
     if (!req.files || (Object.keys(req.files).length === 0)) {
         return res.status(400).send('Файл не был загружен!');
     }
 
-   let work = req.files.workfile;
+    let work_name = NameWithTimestamp(req.files.workfile.name);
 
-   //************* GET FILENAME WITHOUT EXTENSION ****************/
+    // STORE UPLOADED FILE IN /uploaded/ FOLDER :
 
-   let work_ext = work.name.split('.').pop(); // GETTING EXTENSION
+    req.files.workfile.mv(__dirname + '/uploaded/' + work_name, (err) => {
 
-   let work_name = work.name; // WORK NAME ON SERVER
+        if (err)
+            return res.status(500).send('Ошибка при загрузке на сервер');
+        else
+            connection.query('INSERT INTO Workfiles(Filename) VALUES(?)', [work_name], (err) => {
+            if (err) {
+                // 1062 - код ошибки mysql повторяющегося файла
+                if (err.code == 1062)
+                    return res.status(409).send('Файл с таким именем уже существует в базе данных');
 
-   let regex = new RegExp("." + work_ext, "i"); // REGULAR EXPRESSION FOR EXTENSION
+                return res.status(409).send(err.message);
+            }
+            else
+                return res.status(200).send('Файл успешно добавлен в базу данных и загружен на сервер');
+        });
+    });
 
-   // CHECK IF NAME CONTAINS NO EXTENSION
-
-   if (work_name != work_ext)
-      work_name = work_name.replace(regex, "");
-   else
-      work_ext = "";
-
-   // TO AVOID NAME CONFLICTS ADD TIMESTAMP TO FILENAME
-
-   var date = new Date();
-
-   work_name += "_" + date.getFullYear() + (date.getMonth() + 1) + date.getDate()
-       + "_" + date.getHours() + date.getMinutes() + date.getSeconds() + "_" + date.getMilliseconds()
-         + "." + work_ext;
-
-   // STORE UPLOADED FILE IN /uploaded/ FOLDER :
-
-   work.mv(__dirname + '/uploaded/' + work_name,(err) => {
-      if (err)
-         return res.status(500).send('Ошибка при загрузке на сервер');
-   });
-
-   connection.query('INSERT INTO Workfiles(Filename) VALUES(?)',
-       [work_name], (err) => {
-          if (err) {
-             console.log(err);
-
-             if (err.code == 1062) {
-                return res.status(409).send('Файл с таким именем уже существует');
-             }
-             return res.status(409).send(err.message);
-          }
-       });
-
-   console.log(work_name);
-
-   res.status(200).send('Файл успешно добавлен в базу данных и загружен на сервер');
 });
 
+//перенаправление на главную страницу
 app.get('/uploaded', (req, res) => {
    res.redirect('/');
 });
@@ -173,9 +180,9 @@ app.get('/works', (req, res) => {
 
 });
 
-app.get('/cli.js',(req, res) =>
+app.get('/cli.js',(req, res) => {
     res.sendFile(__dirname + '/cli.js')
-);
+});
 
 app.get('/uploaded/:filename',(req,res) => {
    res.sendFile(__dirname + /uploaded/ + req.params.filename);

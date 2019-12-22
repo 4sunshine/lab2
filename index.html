@@ -17,14 +17,16 @@
     <h1>Система оценки работ</h1>
     <hr>
 
-    <form id="uploader" enctype="multipart/form-data" method="POST" action="/uploaded">
-        <section>
-            <h3>Загрузка работ</h3>
-            <p>
-                <input name="workfile" type="file" />
-                <input type="submit" value="Отправить"/>
-            </p>
-        </section>
+    <iframe allowtransparency="true" name="status" id="status"\
+            style="display: block; border: none"\
+            width="100%" height="30px" scrolling="no" onload="clearFrame(this)" ></iframe>
+
+    <form id="uploader" enctype="multipart/form-data" method="POST" action="/uploaded" target="status">
+        <h3>Загрузка работ</h3>
+        <p>
+            <input name="workfile" type="file" />
+            <input type="submit" value="Отправить"/>
+        </p>
     </form>
 
     <form id="assessment">
@@ -47,25 +49,25 @@
     </form>
 
     <form id="markform" style="display: none" style="visibility: hidden" method="POST"\
-          action="/mark" onsubmit="hideElement(this);">
+          action="/mark" target="_self"> <!-- onsubmit="hideElement(this);"> -->
+
         <p>
             <label for="mark">Оцените работу</label>
         </p>
+
         <p>
             <input  id="workname" name="workname" type="text" readonly required>
         </p>
 
         <p><input required id="mark" type="number" name="mark" step="1" value="5" max="5" min="1"></p>
 
-        <p>
-            <label for="comment">Введите комментарий к оценке</label>
-        </p>
+        <p><label for="comment">Введите комментарий к оценке</label></p>
+
         <p>
             <textarea id="comment" name="comment" cols="30" rows="6" required type="text" maxlength="500"></textarea>
         </p>
-        <p>
-        <input type="submit" value="Отправить оценку!">
-        </p>
+
+        <p><input type="submit" value="Отправить оценку!"></p>
     </form>
 
 </body>
