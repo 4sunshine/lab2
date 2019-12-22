@@ -9,6 +9,8 @@ function requestForFilenames() {
         if (xreq.response) {
                 var data = JSON.parse(xreq.responseText);
 
+                ResponseResultShow(xreq.responseText);
+
                 addTask(data);
 
         } else {
@@ -71,25 +73,55 @@ function SetCurrentFileid(areference) {
         enable(document.getElementById("allmarksbutton"));
 }
 
-//очистка уведомления iframe
-function clearFrame(frame) {
-        try {
-                //содержимое документа iframe 1ая строка - Chrome, 2ая - IE
-                //дял пустых iframe выдаёт ошибку чтения contentDocument
-                const content = frame.contentDocument.documentElement.innerText ||
-                    frame.window.contentDocument.documentElement.innerText;
+function ResponseResultShow(text, success = true) {
 
-                if (content) {
+        alert('in');
 
-                        frame.style.backgroundColor = "lightskyblue";
+        var resplabel = document.getElementById("retext");
 
-                        setTimeout(f, 2000);
+        if (success)
+                resplabel.style.backgroundColor = "limegreen";
+        else {
+                alert(text);
 
-                        function f() {
-                                frame.src = "about:blank";
-                                frame.style.backgroundColor = "white";
+                resplabel.style.backgroundColor = "red";
+        }
+
+        resplabel.innerHTML = text;
+
+        setTimeout(f, 2500);
+
+        function f() {
+                resplabel.innerText = "";
+        }
+}
+
+//сброс значений формы с оценкой и комментарием после их принятия на отправку
+function SendPost(form, url) {
+
+        let data = new FormData(form);
+
+        let xreq = new XMLHttpRequest();
+
+        xreq.open('POST',url, true);
+
+        xreq.send(data);
+
+        xreq.onload = () => {
+
+                if (xreq.readyState === 4) {
+
+                        if (xreq.status === 200) {
+
+                                ResponseResultShow(xreq.responseText);
+
+                                form.reset();
+
+                        } else {
+
+                                ResponseResultShow(xreq.responseText, false);
+
                         }
                 }
         }
-        catch (e) {}
 }

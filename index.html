@@ -17,12 +17,10 @@
     <h1>Система оценки работ</h1>
     <hr>
 
-    <iframe allowtransparency="true" name="status" id="status"\
-            style="display: block; border: none"\
-            width="100%" height="30px" scrolling="no" onload="clearFrame(this)" ></iframe>
+    <p><label id="retext" style="display: block"></label></p>
 
     <!-- отклик сервера отображается в iframe : name="status" -->
-    <form id="uploader" enctype="multipart/form-data" method="POST" action="/uploaded" target="status">
+    <form id="uploader" enctype="multipart/form-data" target="_self" onsubmit="SendPost(this,'/uploaded')">
         <h3>Загрузка работ</h3>
         <p>
             <input name="workfile" type="file" />
@@ -39,6 +37,7 @@
 
         <!-- data-fileid - дополнительный аттрибут для хранения Fileid из таблицы Workfiles -->
 
+        <p><a id="mainpage" href="/">Вернуться на главную</a></p>
         <p><a id="work0" target="workwindow" data-fileid="" href="" onclick="SetCurrentFileid(this)"></a></p>
         <p><a id="work1" target="workwindow" data-fileid="" href="" onclick="SetCurrentFileid(this)"></a></p>
         <p><a id="work2" target="workwindow" data-fileid="" href="" onclick="SetCurrentFileid(this)"></a></p>
@@ -49,12 +48,13 @@
                     onclick="javascript: showElement(document.getElementById('markform')); disable(this);"\
                     type="button" disabled>Оценить работу</button>
         </p>
-        <iframe id="workframe" name="workwindow" width="100%" height="90%"></iframe>
+        <iframe id="workframe" name="workwindow" width="100%" height="90%"\
+                onload="this.style.height=this.contentDocument.body.scrollHeight +'px';"></iframe>
 
     </form>
 
-    <form id="markform" style="display: none" style="visibility: hidden" method="POST"\
-          action="/mark" target="status"> <!-- onsubmit="hideElement(this);"> -->
+    <form id="markform" style="display: none" style="visibility: hidden"\
+          target="status" onsubmit="SendPost(this, '/mark')"> <!-- onsubmit="hideElement(this);"> -->
 
         <!-- скрытые поля input для передачи имени файла и его идентификатора -->
         <p><input id="fileid" name="fileid" type="hidden"></p>
