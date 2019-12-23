@@ -17,10 +17,13 @@
     <h1>Система оценки работ</h1>
     <hr>
 
+    <!-- текст отклика сервера -->
     <p><label id="retext" style="display: block"></label></p>
 
     <!-- отклик сервера отображается в iframe : name="status" -->
-    <form id="uploader" enctype="multipart/form-data" target="_self" onsubmit="SendPost(this,'/uploaded')">
+    <!-- return false отменяет действие по умолчанию при событии onsubmit -->
+    <form id="uploader" enctype="multipart/form-data" method="post" \
+          onsubmit="Send(this,'/uploaded'); return false" target="_self">
         <h3>Загрузка работ</h3>
         <p>
             <input name="workfile" type="file" />
@@ -53,10 +56,10 @@
 
     </form>
 
-    <form id="markform" style="display: none" style="visibility: hidden"\
-          target="status" onsubmit="SendPost(this, '/mark')"> <!-- onsubmit="hideElement(this);"> -->
+    <form id="markform" style="display: none" style="visibility: hidden" method="post" \
+          onsubmit="Send(this, '/mark'); return false"> <!-- onsubmit="hideElement(this);"> -->
 
-        <!-- скрытые поля input для передачи имени файла и его идентификатора -->
+        <!-- скрытое поле input для передачи имени файла и его идентификатора -->
         <p><input id="fileid" name="fileid" type="hidden"></p>
 
         <p><label for="mark">Оцените выбранную работу от 1 до 5</label></p>

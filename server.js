@@ -65,67 +65,26 @@ app.get('/', (req, res) => {
 //обработка загрузки файлов на сервер
 app.post('/uploaded',(req, res) => {
 
-    // Добавление даты и времени обработки файла в его имя. Имя файла_ДатаВремя.Расширение
-    // Для существенного уменьшения вероятности встречи файлов с одинаковыми именами
-    function NameWithTimestamp(Filename) {
-
-        // NameAndExtension возвращает массив: [имя файла, .расширение файла]
-        function NameAndExtension(filename) {
-
-            let file_ext = Filename.split('.').pop(); // GETTING EXTENSION
-
-            let file_name = Filename; // WORK NAME ON SERVER
-
-            let regex = new RegExp("." + file_ext, "i"); // REGULAR EXPRESSION FOR EXTENSION
-
-            // CHECK IF NAME CONTAINS NO EXTENSION
-
-            if ( file_name != file_ext ) {
-
-                file_ext = "." + file_ext;
-
-                file_name = file_name.replace(regex, "");
-            }
-
-            else
-                file_ext = "";
-
-            return [file_name,file_ext];
-        }
-
-        let name_ext = NameAndExtension(Filename);
-
-        let date = new Date();
-
-        return name_ext[0] + "_" + date.getFullYear() + (date.getMonth() + 1) + date.getDate()
-            + "_" + date.getHours() + date.getMinutes() + date.getSeconds() + "_" + date.getMilliseconds()
-            + name_ext[1];
-    }
-
     if (!req.files || (Object.keys(req.files).length === 0)) {
         return res.status(400).send('Файл не был загружен!');
     }
 
-    let work_name = NameWithTimestamp(req.files.workfile.name);
+    let work_name = req.files.workfile.name;
 
-    // STORE UPLOADED FILE IN /uploaded/ FOLDER :
-
-    req.files.workfile.mv(__dirname + '/uploaded/' + work_name, (err) => {
+    connection.query('INSERT INTO Workfiles(Filename) VALUES(?)', [work_name], (err) => {
 
         if (err)
-            return res.status(500).send('Ошибка при загрузке на сервер');
-        else
-            connection.query('INSERT INTO Workfiles(Filename) VALUES(?)', [work_name], (err) => {
-            if (err) {
-                // 1062 - код ошибки mysql повторяющегося файла
-                if (err.code == 1062)
-                    return res.status(409).send('Файл с таким именем уже существует в базе данных');
+            return res.status(409).send('Ошибка загрузки файла в базу данных. Попробуйте переименовать файл.');
 
-                return res.status(409).send(err.message);
-            }
-            else
-                return res.status(200).send('Файл успешно добавлен в базу данных и загружен на сервер');
+        req.files.workfile.mv(__dirname + '/uploaded/' + work_name, (_err) => {
+
+            if (_err)
+                return res.status(500).send('Ошибка при загрузке на сервер');
+
+            return res.status(200).send('Файл успешно добавлен в базу данных и загружен на сервер');
+
         });
+
     });
 
 });
@@ -212,6 +171,7 @@ app.post('/mark',(req, res) => {
                     // например при разрыве соединения
                     return res.status(409).send('Ошибка подсчёта числа оценок!');
                 }
+
                 return res.status(200).send('Оценка выставлена успешно!');
             });
     });

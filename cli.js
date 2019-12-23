@@ -1,3 +1,6 @@
+// скрипт загружается заново каждый раз при загрузке главной страницы
+var alreadyMarked = [];
+
 function requestForFilenames() {
 
         var xreq = new XMLHttpRequest();
@@ -66,16 +69,26 @@ function showMarks() {
 // установка идентификатора текущего файла на проверке
 // данные хранятся в дополнительном аттрибуте data-fileid выбранной ссылки
 function SetCurrentFileid(areference) {
-        document.getElementById("fileid").value = areference.getAttribute('data-fileid');
 
-        enable(document.getElementById("markbutton"));
+        var currentFileid = areference.getAttribute('data-fileid');
+
+        hideElement(document.getElementById("markform"));
+
+        document.getElementById("fileid").value = currentFileid;
 
         enable(document.getElementById("allmarksbutton"));
+
+        if (!alreadyMarked.includes(currentFileid))
+
+                enable(document.getElementById("markbutton"));
+
+        else
+
+                disable(document.getElementById("markbutton"));
+
 }
 
 function ResponseResultShow(text, success = true) {
-
-        alert('in');
 
         var resplabel = document.getElementById("retext");
 
@@ -89,33 +102,37 @@ function ResponseResultShow(text, success = true) {
 
         resplabel.innerHTML = text;
 
-        setTimeout(f, 2500);
+        setTimeout(clearText, 2500);
 
-        function f() {
+        function clearText() {
                 resplabel.innerText = "";
         }
 }
 
 //сброс значений формы с оценкой и комментарием после их принятия на отправку
-function SendPost(form, url) {
+function Send(form, url) {
 
-        let data = new FormData(form);
+        var data = new FormData(form);
 
-        let xreq = new XMLHttpRequest();
+        var xreq = new XMLHttpRequest();
 
-        xreq.open('POST',url, true);
-
-        xreq.send(data);
-
-        xreq.onload = () => {
+        var requestHandler = function() {
 
                 if (xreq.readyState === 4) {
 
                         if (xreq.status === 200) {
 
-                                ResponseResultShow(xreq.responseText);
+                                if (form.id === "markform") {
+
+                                        alreadyMarked.push(form.fileid.value);
+
+                                        hideElement(form);
+
+                                }
 
                                 form.reset();
+
+                                ResponseResultShow(xreq.responseText);
 
                         } else {
 
@@ -123,5 +140,12 @@ function SendPost(form, url) {
 
                         }
                 }
+
         }
+
+        xreq.open('POST',url, true);
+
+        xreq.onreadystatechange = requestHandler;
+
+        xreq.send(data);
 }
