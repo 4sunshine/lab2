@@ -98,50 +98,11 @@ app.get('/works', (req, res) => {
 
    connection.query('SELECT * FROM Workfiles ORDER BY Markscount ASC LIMIT 3',[],
        (err, result) => {
-         if (err)
-            return res.status(404).send(err.message);
 
-         return res.contentType('application/json').status(200).send(JSON.stringify(result));
+           if (err)
+               return res.status(404).send(err.message);
 
-         /////////////////////////////////////////////////////////////////////////////////////
-
-         let resdata = []; // RESPONSE DATA ARRAY
-
-         let workfiles = JSON.parse(JSON.stringify(result));
-
-         console.log(workfiles);
-
-
-
-         bake().then(()=> res.contentType('application/json').status(200).
-            send(JSON.stringify(resdata)), () => res.status(404).send('Error'));
-
-         async function bake() {
-
-             const promises = workfiles.map( (workfile) => {
-
-                 return new Promise((resolve, reject) => {
-
-                     connection.query('SELECT Mark, Comment FROM Assessments WHERE Fileid = ?',
-                         [workfile.Id],
-                         (in_err, in_result, in_fields) => {
-
-                             if (in_err)
-                                 reject('REJECT'); // NEED TO FIX
-
-                             const marksdata = JSON.parse(JSON.stringify(in_result));
-
-                             resdata.push({'Filename': workfile.Filename, 'Reference' : __dirname + '\\uploaded\\' +
-                                     workfile.Filename, 'Marksdata' : marksdata});
-
-                             resolve('SUCCESS');
-                         });
-
-                 });
-
-             });
-             await Promise.all(promises);
-         }
+           return res.contentType('application/json').status(200).send(result);
 
        });
 
@@ -175,4 +136,18 @@ app.post('/mark',(req, res) => {
                 return res.status(200).send('Оценка выставлена успешно!');
             });
     });
+});
+
+app.get('/mark/:id', (req, res) => {
+
+    connection.query('SELECT Mark, Comment FROM Assessments WHERE Fileid = ?',
+        [req.params.id], (err, result) => {
+
+            if (err)
+                res.status(409).send('Не удалось получить оценки для данной работы');
+
+            return res.contentType('application/json').status(200).send(result);
+
+    });
+
 });

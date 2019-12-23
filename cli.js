@@ -1,6 +1,8 @@
 // скрипт загружается заново каждый раз при загрузке главной страницы
 var alreadyMarked = [];
 
+var currentFileid;
+
 function requestForFilenames() {
 
         var xreq = new XMLHttpRequest();
@@ -10,9 +12,8 @@ function requestForFilenames() {
         xreq.send();
 
         if (xreq.response) {
-                var data = JSON.parse(xreq.responseText);
 
-                ResponseResultShow(xreq.responseText);
+                var data = JSON.parse(xreq.responseText);
 
                 addTask(data);
 
@@ -37,11 +38,12 @@ function addTask(data) {
 
                 document.getElementById("work" + i).setAttribute('data-fileid', element.Id);
 
-                document.getElementById("work" + i).style.visibility = 'visible';
+                showElement(document.getElementById("work" + i));
 
                 document.getElementById("work" + i).href = "/uploaded/" + element.Filename;
 
                 i++;
+
         });
 }
 
@@ -64,13 +66,81 @@ function enable(element) {
 
 function showMarks() {
 
+        ClearMarks();
+
+        var xreq = new XMLHttpRequest();
+
+        var requestHandler = function() {
+
+                if (xreq.readyState === 4) {
+
+                        if (xreq.status === 200) {
+
+                                var data = JSON.parse(xreq.responseText);
+
+                                data.forEach((element) => {
+
+                                        CreateMarkAndComment(element.Mark, element.Comment);
+
+                                });
+
+                                showElement(document.getElementById("allmarks"));
+
+                                ResponseResultShow("Оценки получены");
+
+                        } else {
+
+                                ResponseResultShow(xreq.responseText, false);
+
+                        }
+                }
+
+        }
+
+        xreq.open('GET', '/mark/' + currentFileid, true);
+
+        xreq.onreadystatechange = requestHandler;
+
+        xreq.send();
+}
+
+function CreateMarkAndComment(mark, comment) {
+
+        var parentNode = document.getElementById("allmarks");
+
+        var nodemark = document.createElement("h3");
+
+        nodemark.innerText = mark;
+
+        parentNode.appendChild(nodemark);
+
+        var nodep = document.createElement("p");
+
+        nodep.innerText = comment;
+
+        parentNode.appendChild(nodep);
+
+}
+
+function ClearMarks() {
+
+        var parentNode = document.getElementById("allmarks");
+
+        while (parentNode.firstChild) {
+                parentNode.removeChild(parentNode.firstChild);
+        }
+
+        hideElement(parentNode);
+
 }
 
 // установка идентификатора текущего файла на проверке
 // данные хранятся в дополнительном аттрибуте data-fileid выбранной ссылки
 function SetCurrentFileid(areference) {
 
-        var currentFileid = areference.getAttribute('data-fileid');
+        ClearMarks();
+
+        currentFileid = areference.getAttribute('data-fileid');
 
         hideElement(document.getElementById("markform"));
 
