@@ -1,83 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Work assessment system</title>
-    <script src ="/cli.js"></script>
-
-    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"> -->
+    <title>Система оценки работ</title>
+    <script src ="/client.js"></script>
 </head>
-
 <body>
-<!-- <div class="container"> -->
     <hr>
     <h1>Система оценки работ</h1>
     <hr>
-
-    <!-- текст отклика сервера -->
+    <!-- текстовая метка отклика сервера -->
     <p><label id="retext" style="display: block"></label></p>
 
-    <!-- отклик сервера отображается в iframe : name="status" -->
+    <!-- enctype="multipart/form-data - аттрибут для передачи файлов -->
+    <!-- по умолчанию  submit использует метод GET. Поэтому меняем method="POST"-->
     <!-- return false отменяет действие по умолчанию при событии onsubmit -->
-    <form id="uploader" enctype="multipart/form-data" method="post" \
-          onsubmit="Send(this,'/uploaded'); return false" target="_self">
+    <form id="uploader" enctype="multipart/form-data" method="POST"\
+          onsubmit="Send(this,'/uploaded'); return false">
         <h3>Загрузка работ</h3>
         <p>
-            <input name="workfile" type="file" />
-            <input type="submit" value="Отправить"/>
+            <!-- выбор файла для загрузки -->
+           <input name="workfile" type="file" />
+           <input type="submit" value="Отправить"/>
         </p>
     </form>
 
-    <form id="assessment">
+    <!-- Форма для перехода на страницу оценки работ -->
+    <form id="startGrades">
         <h3 id="wh">Оценка работ</h3>
         <button id="wb" type="button" onclick="requestForFilenames()">Взять на оценку</button>
     </form>
 
+    <!-- форма для просмотра работ по умолчанию невидимый-->
     <form id="task" style="visibility: hidden">
-
-        <!-- data-fileid - дополнительный аттрибут для хранения Fileid из таблицы Workfiles -->
-
         <p><a id="mainpage" href="/">Вернуться на главную</a></p>
+        <!-- data-fileid - дополнительный аттрибут для хранения Fileid из таблицы Workfiles -->
+        <!-- target - атрибут имени "места" для отображения результата перехода по ссылке -->
         <p><a id="work0" target="workwindow" data-fileid="" href="" onclick="SetCurrentFileid(this)"></a></p>
         <p><a id="work1" target="workwindow" data-fileid="" href="" onclick="SetCurrentFileid(this)"></a></p>
         <p><a id="work2" target="workwindow" data-fileid="" href="" onclick="SetCurrentFileid(this)"></a></p>
         <p>
             <button id = "allmarksbutton"\
                     onclick="showMarks()" type="button" disabled>Показать оценки и комментарии</button>
-            <button id = "markbutton"\
+            <button id = "markbutton" \
                     onclick="javascript: showElement(document.getElementById('markform')); disable(this);"\
                     type="button" disabled>Оценить работу</button>
         </p>
-        <iframe id="workframe" name="workwindow" width="100%" height="90%"\
-                onload="this.style.height=this.contentDocument.body.scrollHeight +'px';"></iframe>
-
+        <!--рамка нужного размера-->
+        <iframe id="workframe" name="workwindow" width="100%" height="250"></iframe>
     </form>
 
     <form id="markform" style="display: none; visibility: hidden" method="post" \
-          onsubmit="Send(this, '/mark'); return false"> <!-- onsubmit="hideElement(this);"> -->
-
+          onsubmit="Send(this, '/mark'); return false">
         <!-- скрытое поле input для передачи имени файла и его идентификатора -->
         <p><input id="fileid" name="fileid" type="hidden"></p>
-
         <p><label for="mark">Оцените выбранную работу от 1 до 5</label></p>
-
         <p><input required id="mark" type="number" name="mark" step="1" max="5" min="1"></p>
-
         <p><label for="comment">Введите комментарий к оценке</label></p>
-
         <p>
             <textarea required id="comment" name="comment" cols="30" rows="6" type="text" maxlength="500"></textarea>
         </p>
-
         <p><input type="submit" value="Отправить оценку!"></p>
-    </form>
 
+    </form>
     <form id="allmarks" style="display: none; visibility: hidden">
     </form>
 
 </body>
-
 </html>
